@@ -12,6 +12,7 @@
 #include "chips/chips_common.h"
 #include "common.h"
 #include "chips/z80.h"
+#include "chips/ef9345.h"
 #include "chips/beeper.h"
 #include "chips/clk.h"
 #include "chips/kbd.h"
@@ -31,6 +32,7 @@
     #include "ui/ui_audio.h"
     #include "ui/ui_snapshot.h"
     #include "ui/ui_vg5000.h"
+    #include "ui/ui_ef9345.h"
 #endif
 
 typedef struct {
