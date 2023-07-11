@@ -128,7 +128,7 @@ void app_init(void) {
         });
         ui_load_snapshots_from_storage();
     #endif
-    bool delay_input = false;
+    // bool delay_input = false;
     // TODO: load file from command line
     // if (sargs_exists("file")) {
     //     delay_input = true;
