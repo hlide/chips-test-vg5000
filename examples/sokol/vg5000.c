@@ -44,17 +44,17 @@ static struct {
     uint32_t ticks;
     double emu_time_ms;
     #ifdef CHIPS_USE_UI
-        ui_atom_t ui;
-        atom_snapshot_t snapshots[UI_SNAPSHOT_MAX_SLOTS];
+        ui_vg5000_t ui;
+        vg5000_snapshot_t snapshots[UI_SNAPSHOT_MAX_SLOTS];
     #endif
 } state;
 
 #ifdef CHIPS_USE_UI
-// static void ui_draw_cb(void);
-// static void ui_boot_cb(atom_t* sys);
-// static void ui_save_snapshot(size_t slot_index);
-// static bool ui_load_snapshot(size_t slot_index);
-// static void ui_load_snapshots_from_storage(void);
+static void ui_draw_cb(void);
+static void ui_boot_cb(vg5000_t* sys, vg5000_type_t type);
+static void ui_save_snapshot(size_t slot_index);
+static bool ui_load_snapshot(size_t slot_index);
+static void ui_load_snapshots_from_storage(void);
 #define BORDER_TOP (24)
 #else
 #define BORDER_TOP (8)
@@ -100,8 +100,8 @@ void app_init(void) {
     });
     #ifdef CHIPS_USE_UI
         ui_init(ui_draw_cb);
-        ui_atom_init(&state.ui, &(ui_atom_desc_t){
-            .atom = &state.atom,
+        ui_vg5000_init(&state.ui, &(ui_vg5000_desc_t){
+            .vg5000 = &state.vg5000,
             .boot_cb = ui_boot_cb,
             .dbg_texture = {
                 .create_cb = gfx_create_texture,
@@ -159,6 +159,17 @@ void app_frame(void) {
 
 /* keyboard input handling */
 void app_input(const sapp_event* event) {
+    // TODO: accept dropped files also when ImGui grabs input
+    // if (event->type == SAPP_EVENTTYPE_FILES_DROPPED) {
+    //     fs_start_load_dropped_file(FS_SLOT_IMAGE);
+    // }
+    #ifdef CHIPS_USE_UI
+    if (ui_input(event)) {
+        // input was handled by UI
+        return;
+    }
+    #endif
+    // TODO: handle keyboard input
 }
 
 void app_cleanup(void) {
@@ -182,6 +193,68 @@ static void draw_status_bar(void) {
     sdtx_pos(1.0f, (h / 8.0f) - 1.5f);
     sdtx_printf("frame:%.2fms emu:%.2fms (min:%.2fms max:%.2fms) ticks:%d", (float)state.frame_time_us * 0.001f, emu_stats.avg_val, emu_stats.min_val, emu_stats.max_val, state.ticks);
 }
+
+#if defined(CHIPS_USE_UI)
+
+void ui_draw_cb(void) {
+    ui_vg5000_draw(&state.ui);
+}
+
+static void ui_boot_cb(vg5000_t* sys, vg5000_type_t type) {
+    vg5000_desc_t desc = vg5000_desc();
+    vg5000_init(sys, &desc);
+}
+
+static void ui_update_snapshot_screenshot(size_t slot) {
+    ui_snapshot_screenshot_t screenshot = {
+        .texture = gfx_create_screenshot_texture(vg5000_display_info(&state.snapshots[slot].vg5000))
+    };
+    ui_snapshot_screenshot_t prev_screenshot = ui_snapshot_set_screenshot(&state.ui.snapshot, slot, screenshot);
+    if (prev_screenshot.texture) {
+        gfx_destroy_texture(prev_screenshot.texture);
+    }
+}
+
+static void ui_save_snapshot(size_t slot) {
+    if (slot < UI_SNAPSHOT_MAX_SLOTS) {
+        state.snapshots[slot].version = vg5000_save_snapshot(&state.vg5000, &state.snapshots[slot].vg5000);
+        ui_update_snapshot_screenshot(slot);
+        fs_save_snapshot("vg5000", slot, (chips_range_t){ .ptr = &state.snapshots[slot], sizeof(vg5000_snapshot_t) });
+    }
+}
+
+static bool ui_load_snapshot(size_t slot) {
+    bool success = false;
+    if ((slot < UI_SNAPSHOT_MAX_SLOTS) && (state.ui.snapshot.slots[slot].valid)) {
+        success = vg5000_load_snapshot(&state.vg5000, state.snapshots[slot].version, &state.snapshots[slot].vg5000);
+    }
+    return success;
+}
+
+static void ui_fetch_snapshot_callback(const fs_snapshot_response_t* response) {
+    assert(response);
+    if (response->result != FS_RESULT_SUCCESS) {
+        return;
+    }
+    if (response->data.size != sizeof(vg5000_snapshot_t)) {
+        return;
+    }
+    if (((vg5000_snapshot_t*)response->data.ptr)->version != VG5000_SNAPSHOT_VERSION) {
+        return;
+    }
+    size_t snapshot_slot = response->snapshot_index;
+    assert(snapshot_slot < UI_SNAPSHOT_MAX_SLOTS);
+    memcpy(&state.snapshots[snapshot_slot], response->data.ptr, response->data.size);
+    ui_update_snapshot_screenshot(snapshot_slot);
+}
+
+static void ui_load_snapshots_from_storage(void) {
+    for (size_t snapshot_slot = 0; snapshot_slot < UI_SNAPSHOT_MAX_SLOTS; snapshot_slot++) {
+        fs_start_load_snapshot(FS_SLOT_SNAPSHOTS, "vg5000", snapshot_slot, ui_fetch_snapshot_callback);
+    }
+}
+#endif
+
 
 sapp_desc sokol_main(int argc, char* argv[]) {
     sargs_setup(&(sargs_desc){ .argc=argc, .argv=argv });
