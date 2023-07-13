@@ -29,11 +29,11 @@
 #include "chips/chips_common.h"
 #include "common.h"
 #include "chips/z80.h"
+#include "chips/mem.h"
 #include "chips/ef9345.h"
 #include "chips/beeper.h"
 #include "chips/clk.h"
 #include "chips/kbd.h"
-#include "chips/mem.h"
 #include "systems/vg5000.h"
 #include "vg5000-roms.h"
 #if defined(CHIPS_USE_UI)
@@ -70,7 +70,7 @@ static struct {
 
 #ifdef CHIPS_USE_UI
 static void ui_draw_cb(void);
-static void ui_boot_cb(vg5000_t* sys, vg5000_type_t type);
+static void ui_boot_cb(vg5000_t* sys);
 static void ui_save_snapshot(size_t slot_index);
 static bool ui_load_snapshot(size_t slot_index);
 static void ui_load_snapshots_from_storage(void);
@@ -219,7 +219,7 @@ void ui_draw_cb(void) {
     ui_vg5000_draw(&state.ui);
 }
 
-static void ui_boot_cb(vg5000_t* sys, vg5000_type_t type) {
+static void ui_boot_cb(vg5000_t* sys) {
     vg5000_desc_t desc = vg5000_desc();
     vg5000_init(sys, &desc);
 }

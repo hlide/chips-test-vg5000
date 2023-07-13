@@ -3,11 +3,11 @@
 */
 #include "chips/chips_common.h"
 #include "chips/z80.h"
+#include "chips/mem.h"
 #include "chips/ef9345.h"
 #include "chips/beeper.h"
 #include "chips/kbd.h"
 #include "chips/clk.h"
-#include "chips/mem.h"
 #include "systems/vg5000.h"
 #define UI_DASM_USE_Z80
 #define UI_DBG_USE_Z80
