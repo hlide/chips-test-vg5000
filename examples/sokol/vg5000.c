@@ -189,7 +189,41 @@ void app_input(const sapp_event* event) {
         return;
     }
     #endif
-    // TODO: handle keyboard input
+    switch (event->type) {
+        int c;
+        case SAPP_EVENTTYPE_CHAR:
+            c = (int) event->char_code;
+            if ((c > 0x20) && (c < 0x7F)) {
+                vg5000_key_down(&state.vg5000, c);
+                vg5000_key_up(&state.vg5000, c);
+            }
+            break;
+        case SAPP_EVENTTYPE_KEY_DOWN:
+        case SAPP_EVENTTYPE_KEY_UP:
+            switch (event->key_code) {
+                case SAPP_KEYCODE_SPACE:        c = 0x20; break;
+                case SAPP_KEYCODE_LEFT:         c = 0x08; break;
+                case SAPP_KEYCODE_RIGHT:        c = 0x09; break;
+                case SAPP_KEYCODE_DOWN:         c = 0x0A; break;
+                case SAPP_KEYCODE_UP:           c = 0x0B; break;
+                case SAPP_KEYCODE_ENTER:        c = 0x0D; break;
+                case SAPP_KEYCODE_BACKSPACE:    c = 0x0C; break;
+                case SAPP_KEYCODE_ESCAPE:       c = 0x07; break;
+                case SAPP_KEYCODE_LEFT_CONTROL: c = 0x0F; break; // SymShift
+                default:                        c = 0; break;
+            }
+            if (c) {
+                if (event->type == SAPP_EVENTTYPE_KEY_DOWN) {
+                    vg5000_key_down(&state.vg5000, c);
+                }
+                else {
+                    vg5000_key_up(&state.vg5000, c);
+                }
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void app_cleanup(void) {
