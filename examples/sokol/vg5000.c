@@ -82,9 +82,18 @@ static void ui_load_snapshots_from_storage(void);
 #define BORDER_RIGHT (8)
 #define BORDER_BOTTOM (16)
 
+static void push_audio(const float* samples, int num_samples, void* user_data) {
+    (void)user_data;
+    saudio_push(samples, num_samples);
+}
+
 vg5000_desc_t vg5000_desc() {
     return (vg5000_desc_t) {
         .type = VG5000_TYPE_11,
+        .audio = {
+            .callback = { .func = push_audio },
+            .sample_rate = saudio_sample_rate(),
+        },        
         .roms = {
             .vg5000_10 = { .ptr = dump_vg5000_rom_10, .size = sizeof(dump_vg5000_rom_10) },
             .vg5000_11 = { .ptr = dump_vg5000_rom_11, .size = sizeof(dump_vg5000_rom_11) },
