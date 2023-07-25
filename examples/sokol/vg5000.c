@@ -121,7 +121,7 @@ void app_init(void) {
         },
         .display_info = vg5000_display_info(&state.vg5000)
     });
-    keybuf_init(&(keybuf_desc_t){ .key_delay_frames = 10 });
+    keybuf_init(&(keybuf_desc_t){ .key_delay_frames = 5 });
     clock_init();
     prof_init();
     fs_init();
@@ -156,21 +156,23 @@ void app_init(void) {
         });
         ui_load_snapshots_from_storage();
     #endif
-    // bool delay_input = false;
+
+    bool delay_input = false;
     // TODO: load file from command line
     // if (sargs_exists("file")) {
     //     delay_input = true;
     //     fs_start_load_file(FS_SLOT_IMAGE, sargs_value("file"));
     // }
-    // TODO: load input from command line
-    // if (!delay_input) {
-    //     if (sargs_exists("input")) {
-    //         keybuf_put(sargs_value("input"));
-    //     }
-    // }
+    if (!delay_input) {
+        if (sargs_exists("input")) {
+            keybuf_put(sargs_value("input"));
+        }
+    }
 
 }
 
+static void handle_file_loading(void);
+static void send_keybuf_input(void);
 static void draw_status_bar(void);
 
 void app_frame(void) {
@@ -181,10 +183,8 @@ void app_frame(void) {
     draw_status_bar();
     gfx_draw(vg5000_display_info(&state.vg5000));
 
-    // TODO: load file from command line
-    //handle_file_loading();
-    // TODO: load input from command line
-    //send_keybuf_input();
+    handle_file_loading();
+    send_keybuf_input();
 }
 
 /* keyboard input handling */
@@ -256,6 +256,19 @@ void app_cleanup(void) {
     saudio_shutdown();
     gfx_shutdown();
     sargs_shutdown();
+}
+
+// TODO: implement
+static void handle_file_loading(void) {
+
+}
+
+static void send_keybuf_input(void) {
+    uint8_t key_code;
+    if (0 != (key_code = keybuf_get(state.frame_time_us))) {
+        vg5000_key_down(&state.vg5000, key_code);
+        vg5000_key_up(&state.vg5000, key_code);
+    }
 }
 
 static void draw_status_bar(void) {
