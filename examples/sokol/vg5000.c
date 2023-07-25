@@ -99,6 +99,7 @@ vg5000_desc_t vg5000_desc() {
             .vg5000_11 = { .ptr = dump_vg5000_rom_11, .size = sizeof(dump_vg5000_rom_11) },
             .ef9345_charset = { .ptr = dump_vg5000_charset_rom, .size = sizeof(dump_vg5000_charset_rom) },
         },
+        .audible_tape = false,
         #if defined(CHIPS_USE_UI)
         .debug = ui_vg5000_get_debug(&state.ui)
         #endif
