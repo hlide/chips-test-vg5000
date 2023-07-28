@@ -1,6 +1,14 @@
-# chips-test
+# chips-test (VG5000µ branch)
 
-[![Build Status](https://github.com/floooh/chips-test/workflows/build_and_test/badge.svg)](https://github.com/floooh/chips-test/actions)
+## This branch
+
+[![Build Status](https://github.com/mokona/chips-test/workflows/build_and_test/badge.svg?branch=vg5000)](https://github.com/mokona/chips-test/actions)
+
+This branch is dedicated to emulation of the [VG5000µ computer](https://fr.wikipedia.org/wiki/Philips_VG5000%C2%B5).
+
+## Original README.md
+
+-[![Build Status](https://github.com/floooh/chips-test/workflows/build_and_test/badge.svg)](https://github.com/floooh/chips-test/actions)
 
 Tests and sample emulators for https://github.com/floooh/chips
 
