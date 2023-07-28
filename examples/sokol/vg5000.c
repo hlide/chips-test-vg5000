@@ -385,11 +385,10 @@ static void handle_file_loading(void) {
             load_success = k7_to_tape_buffer(&state.vg5000, file_data, &tape_buffer);
             if (load_success) {
                 load_success = vg5000_insert_tape(&state.vg5000, tape_buffer);
-                printf("Inserting tape: %s\n", load_success ? "success" : "failure");
+                keybuf_put("CLOAD\n");
             }
+            printf("Inserting tape: %s\n", load_success ? "success" : "failure");
             k7_to_tape_buffer_free(tape_buffer);
-            //keybuf_put((const char*)file_data.ptr);
-            keybuf_put("CLOAD\n");
         }
         else {
             // TODO: implement quickload
