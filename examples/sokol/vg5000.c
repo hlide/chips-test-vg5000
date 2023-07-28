@@ -53,6 +53,8 @@
     #include "ui/ui_vg5000.h"
 #endif
 
+#include <stdlib.h> // For malloc
+
 typedef struct {
     uint32_t version;
     vg5000_t vg5000;
