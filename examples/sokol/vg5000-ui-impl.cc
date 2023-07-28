@@ -8,6 +8,7 @@
 #include "chips/beeper.h"
 #include "chips/kbd.h"
 #include "chips/clk.h"
+#include "chips/tape_recorder.h"
 #include "systems/vg5000.h"
 #define UI_DASM_USE_Z80
 #define UI_DBG_USE_Z80

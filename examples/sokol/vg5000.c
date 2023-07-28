@@ -34,6 +34,7 @@
 #include "chips/beeper.h"
 #include "chips/clk.h"
 #include "chips/kbd.h"
+#include "chips/tape_recorder.h"
 #include "systems/vg5000.h"
 #include "vg5000-roms.h"
 #if defined(CHIPS_USE_UI)
@@ -384,7 +385,7 @@ static void handle_file_loading(void) {
             chips_range_t tape_buffer;
             load_success = k7_to_tape_buffer(&state.vg5000, file_data, &tape_buffer);
             if (load_success) {
-                load_success = vg5000_insert_tape(&state.vg5000, tape_buffer);
+                load_success = vg5000_insert_tape(&state.vg5000, tape_buffer, file_data);
                 keybuf_put("CLOAD\n");
             }
             printf("Inserting tape: %s\n", load_success ? "success" : "failure");
