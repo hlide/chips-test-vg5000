@@ -429,7 +429,21 @@ static void draw_status_bar(void) {
     sdtx_canvas(w, h);
     sdtx_color3b(255, 255, 255);
     sdtx_pos(1.0f, (h / 8.0f) - 1.5f);
-    sdtx_printf("frame:%.2fms emu:%.2fms (min:%.2fms max:%.2fms) ticks:%d", (float)state.frame_time_us * 0.001f, emu_stats.avg_val, emu_stats.min_val, emu_stats.max_val, state.ticks);
+
+    char * cassette_status;
+    if (state.vg5000.tape_recorder.error) {
+        cassette_status = "ERROR";
+    }
+    else if (state.vg5000.tape_recorder.motor_on) {
+        cassette_status = "ON";
+    }
+    else {
+        cassette_status = "STOP";
+    }
+
+    sdtx_printf("frame:%.2fms emu:%.2fms (min:%.2fms max:%.2fms) ticks:%d cass:%s",
+                (float)state.frame_time_us * 0.001f, emu_stats.avg_val, emu_stats.min_val, emu_stats.max_val, state.ticks,
+                cassette_status);
 }
 
 #if defined(CHIPS_USE_UI)
