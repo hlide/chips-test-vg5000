@@ -50,6 +50,7 @@
     #include "ui/ui_audio.h"
     #include "ui/ui_snapshot.h"
     #include "ui/ui_ef9345.h"
+    #include "ui/ui_taperecorder.h"
     #include "ui/ui_vg5000.h"
 #endif
 
