@@ -111,6 +111,9 @@ vg5000_desc_t vg5000_desc() {
 }
 
 void app_init(void) {
+    saudio_setup(&(saudio_desc){
+        .logger.func = slog_func,
+    });
     vg5000_desc_t desc = vg5000_desc();
     vg5000_init(&state.vg5000, &desc);
     gfx_init(&(gfx_desc_t){
@@ -129,9 +132,6 @@ void app_init(void) {
     clock_init();
     prof_init();
     fs_init();
-    saudio_setup(&(saudio_desc){
-        .logger.func = slog_func,
-    });
     #ifdef CHIPS_USE_UI
         ui_init(ui_draw_cb);
         ui_vg5000_init(&state.ui, &(ui_vg5000_desc_t){
